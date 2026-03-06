@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FAQ — JC Optimización Digitales</title>
+<link rel="stylesheet" href="shared.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+.faq-layout { max-width: 1200px; margin: 0 auto; padding: 60px 40px 120px; display: grid; grid-template-columns: 280px 1fr; gap: 80px; align-items: start; }
+.faq-sidebar { position: sticky; top: 100px; }
+.faq-sidebar h4 { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
+.faq-category-btn {
+  display: block; width: 100%; text-align: left;
+  background: none; border: none; cursor: pointer;
+  padding: 12px 16px; border-radius: 6px; font-size: 14px;
+  color: var(--muted); font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s; margin-bottom: 4px; border-left: 2px solid transparent;
+}
+.faq-category-btn:hover { color: var(--charcoal); background: rgba(0,0,0,0.04); }
+.faq-category-btn.active { color: var(--teal); border-left-color: var(--teal); background: rgba(13,148,136,0.05); font-weight: 500; }
+
+.faq-main {}
+.faq-group { margin-bottom: 64px; }
+.faq-group-title { font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--teal); margin-bottom: 28px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.faq-item { border-bottom: 1px solid var(--border); }
+.faq-question {
+  width: 100%; text-align: left; background: none; border: none; cursor: pointer;
+  padding: 24px 0; display: flex; justify-content: space-between; align-items: center;
+  gap: 20px; font-family: 'Cormorant Garamond', serif; font-size: 22px;
+  color: var(--charcoal); line-height: 1.2; transition: color 0.2s;
+}
+.faq-question:hover { color: var(--teal); }
+.faq-question.open { color: var(--teal); }
+.faq-icon { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; color: var(--muted); transition: all 0.3s; }
+.faq-question.open .faq-icon { background: var(--teal); border-color: var(--teal); color: white; transform: rotate(45deg); }
+.faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.4s ease, padding 0.3s ease; }
+.faq-answer.open { max-height: 400px; padding-bottom: 24px; }
+.faq-answer p { font-size: 15px; color: var(--muted); line-height: 1.8; }
+.faq-answer ul { margin-top: 12px; padding-left: 20px; }
+.faq-answer ul li { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 6px; }
+.faq-answer a { color: var(--teal); text-decoration: none; }
+.faq-answer a:hover { text-decoration: underline; }
+
+/* CONTACT CTA */
+.contact-cta { background: var(--cream); border: 1px solid var(--border); border-radius: 12px; padding: 48px; text-align: center; margin-top: 60px; }
+.contact-cta h3 { font-size: 32px; margin-bottom: 12px; }
+.contact-cta p { color: var(--muted); font-size: 15px; margin-bottom: 32px; }
+.contact-cta-buttons { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+
+/* SEARCH BAR */
+.faq-search { position: relative; margin-bottom: 48px; }
+.faq-search input { width: 100%; border: 1px solid var(--border); border-radius: 6px; padding: 16px 20px 16px 48px; font-size: 15px; font-family: 'DM Sans', sans-serif; background: white; outline: none; transition: border-color 0.2s; }
+.faq-search input:focus { border-color: var(--teal); }
+.faq-search i { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 16px; }
+
+@media (max-width: 900px) {
+  .faq-layout { grid-template-columns: 1fr; gap: 40px; }
+  .faq-sidebar { position: static; display: flex; gap: 8px; flex-wrap: wrap; }
+  .faq-category-btn { width: auto; border-left: none; border-bottom: 2px solid transparent; border-radius: 99px; padding: 8px 16px; }
+  .faq-category-btn.active { border-bottom-color: var(--teal); }
+}
+@media (max-width: 600px) {
+  .faq-layout { padding: 40px 20px 80px; }
+  .faq-question { font-size: 18px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-mark">J</div>
+      <span class="logo-text">JC <span>Optimización</span></span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Inicio</a>
+      <a href="servicios.html">Servicios</a>
+      <a href="blog.html">Blog</a>
+      <a href="faq.html" class="active">FAQ</a>
+      <a href="servicios.html" class="nav-cta">Contratar</a>
+    </div>
+    <button class="nav-mobile-toggle" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="mobileMenu">
+  <a href="index.html" onclick="toggleMobileMenu()">Inicio</a>
+  <a href="servicios.html" onclick="toggleMobileMenu()">Servicios</a>
+  <a href="blog.html" onclick="toggleMobileMenu()">Blog</a>
+  <a href="faq.html" onclick="toggleMobileMenu()">FAQ</a>
+  <a href="servicios.html" onclick="toggleMobileMenu()">Contratar →</a>
+</div>
+
+<div class="page-header">
+  <div class="page-tag">Preguntas frecuentes</div>
+  <h1>Todo lo que necesitas saber.</h1>
+  <p>Resolvemos tus dudas antes de que las tengas. Si no encuentras lo que buscas, escríbenos por WhatsApp.</p>
+</div>
+
+<div class="faq-layout">
+  <!-- Sidebar -->
+  <div class="faq-sidebar reveal">
+    <h4>Categorías</h4>
+    <button class="faq-category-btn active" onclick="filterCategory('all', this)">Todas las preguntas</button>
+    <button class="faq-category-btn" onclick="filterCategory('servicios', this)">Servicios</button>
+    <button class="faq-category-btn" onclick="filterCategory('pago', this)">Pagos</button>
+    <button class="faq-category-btn" onclick="filterCategory('entrega', this)">Entregas</button>
+    <button class="faq-category-btn" onclick="filterCategory('calidad', this)">Calidad</button>
+  </div>
+
+  <!-- Main -->
+  <div class="faq-main reveal delay-1">
+    <div class="faq-search">
+      <i class="fas fa-search"></i>
+      <input type="text" placeholder="Buscar una pregunta..." id="faqSearch" oninput="searchFAQ(this.value)">
+    </div>
+
+    <!-- SERVICIOS -->
+    <div class="faq-group" data-category="servicios">
+      <div class="faq-group-title">Servicios</div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFAQ(this)">
+          ¿Qué tipo de documentos pueden hacer?
+          <span class="faq-icon"><i class="fas fa-plus"></i></span>
+        </button>
+        <div class="faq-answer">
+          <p>Trabajamos con una amplia variedad de documentos profesionales:</p>
+          <ul>
+            <li>Hojas de vida optimizadas para sistemas ATS</li>
+            <li>Presentaciones en PowerPoint y Google Slides</li>
+            <li>Documentos en Word (cartas, informes, contratos, manuales)</li>
+            <li>Plantillas y automatizaciones en Excel</li>
+            <li>Traducción de documentos (inglés ↔ español)</li>
+            <li>Páginas web básicas para negocios</li>
+            <li>Digitalización de documentos físicos</li>
+            <li>Corrección y mejora de textos</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFAQ(this)">
+          ¿Puedo pedir algo personalizado que no está en la lista?
+          <span class="faq-icon"><i class="fas fa-plus"></i></span>
+        </button>
+        <div class="faq-answer">
+          <p>¡Claro que sí! Si necesitas algo específico que no aparece en nuestro catálogo, escríbenos por <a href="https://wa.me/573043854745" target="_blank">WhatsApp</a> y lo evaluamos juntos. Nos adaptamos a las necesidades de cada cliente.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFAQ(this)">
+          ¿Trabajan con empresas o solo con personas naturales?
+          <span class="faq-icon"><i class="fas fa-plus"></i></span>
+        </button>
+        <div class="faq-answer">
+          <p>Trabajamos con ambos. Atendemos a estudiantes, profesionales independientes y también a pequeñas y medianas empresas que necesitan documentación profesional de calidad.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGO -->
+    <div class="faq-group" data-category="pago">
+      <div class="faq-group-title">Pagos</div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFAQ(this)">
+          ¿Cómo puedo pagar?
+          <span class="faq-icon"><i class="fas fa-plus"></i></span>
+        </button>
+        <div class="faq-answer">
+          <p>Actualmente aceptamos pagos por <strong>Nequi</strong> al número 3043854745. Es rápido, seguro y no tiene costo adicional. Una vez realices el pago, nos confirmas por WhatsApp con el comprobante.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFAQ(this)">
+          ¿El pago se hace antes o después de recibir el documento?
+          <span class="faq-icon"><i class="fas fa-plus"></i></span>
+        </button>
+        <div class="faq-answer">
+          <p>El pago se realiza antes de iniciar el trabajo. Esto nos permite garantizar disponibilidad y priorizar tu pedido. Una vez confirmamos el pago, comenzamos inmediatamente.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFAQ(this)">
+          ¿Qué pasa si no quedo satisfecho con el resultado?
+          <span class="faq-icon"><i class="fas fa-plus"></i></span>
+        </button>
+        <div class="faq-answer">
+          <p>Tu satisfacción es nuestra prioridad. Si el documento no cumple con lo acordado, realizamos las correcciones necesarias sin costo adicional. Nos comprometemos a que el resultado final sea exactamente lo que necesitas.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENTREGA -->
+    <div class="faq-group" data-category="entrega">
+      <div class="faq-group-title">Entregas</div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFAQ(this)">
+          ¿En cuánto tiempo recibo mi documento?
+          <span class="faq-icon"><i class="fas fa-plus"></i></span>
+        </button>
+        <div class="faq-answer">
+          <p>La mayoría de los documentos se entregan en <strong>24 a 48 horas hábiles</strong> después de confirmar el pago. Proyectos más complejos como páginas web pueden tomar un poco más. Siempre te informamos el tiempo estimado antes de iniciar.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFAQ(this)">
+          ¿Cómo me entregan el documento?
+          <span class="faq-icon"><i class="fas fa-plus"></i></span>
+        </button>
+        <div class="faq-answer">
+          <p>Te enviamos el documento por <strong>WhatsApp o correo electrónico</strong>, según tu preferencia. Siempre enviamos el archivo en el formato que necesitas (PDF, Word, Excel, PowerPoint, etc.).</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFAQ(this)">
+          ¿Puedo solicitar una entrega urgente?
+          <span class="faq-icon"><i class="fas fa-plus"></i></span>
+        </button>
+        <div class="faq-answer">
+          <p>Sí, en muchos casos podemos priorizar tu pedido para entregarlo en menos tiempo. Escríbenos por <a href="https://wa.me/573043854745" target="_blank">WhatsApp</a> indicando tu fecha límite y lo evaluamos juntos.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CALIDAD -->
+    <div class="faq-group" data-category="calidad">
+      <div class="faq-group-title">Calidad y proceso</div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFAQ(this)">
+          ¿Usan plantillas genéricas o todo es personalizado?
+          <span class="faq-icon"><i class="fas fa-plus"></i></span>
+        </button>
+        <div class="faq-answer">
+          <p>Todo es <strong>100% personalizado</strong>. No usamos plantillas genéricas que se ven iguales para todos. Cada documento se diseña teniendo en cuenta tu perfil, tu industria y tus objetivos específicos.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFAQ(this)">
+          ¿Usan inteligencia artificial para crear los documentos?
+          <span class="faq-icon"><i class="fas fa-plus"></i></span>
+        </button>
+        <div class="faq-answer">
+          <p>Combinamos herramientas de inteligencia artificial con revisión y edición humana experta. Esto nos permite ofrecer la mejor calidad posible en el menor tiempo. El resultado final siempre pasa por un control humano antes de enviarlo.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFAQ(this)">
+          ¿Mis datos están seguros?
+          <span class="faq-icon"><i class="fas fa-plus"></i></span>
+        </button>
+        <div class="faq-answer">
+          <p>Absolutamente. Toda la información que compartes con nosotros es confidencial y solo se usa para crear tu documento. No compartimos tus datos con terceros bajo ninguna circunstancia.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact CTA -->
+    <div class="contact-cta reveal">
+      <h3>¿No encontraste tu respuesta?</h3>
+      <p>Escríbenos directamente y te respondemos en minutos.</p>
+      <div class="contact-cta-buttons">
+        <a href="https://wa.me/573043854745?text=Hola%20JC%2C%20tengo%20una%20pregunta" target="_blank" class="btn-primary"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=jcoptimizacion1@gmail.com" target="_blank" class="btn-outline"><i class="fas fa-envelope"></i> Correo</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo" style="margin-bottom:16px">
+          <div class="logo-mark">J</div>
+          <span class="logo-text" style="color:white">JC <span>Optimización</span></span>
+        </div>
+        <p>Especialistas en documentos profesionales. Santa Marta, Colombia.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Páginas</h5>
+        <a href="index.html">Inicio</a>
+        <a href="servicios.html">Servicios</a>
+        <a href="blog.html">Blog</a>
+        <a href="faq.html">FAQ</a>
+      </div>
+      <div class="footer-col">
+        <h5>Contacto</h5>
+        <a href="https://wa.me/573043854745" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+        <a href="https://www.instagram.com/jc_optimizacion_digital" target="_blank"><i class="fab fa-instagram"></i> Instagram</a>
+      </div>
+      <div class="footer-col">
+        <h5>Santa Marta</h5>
+        <a href="#">Colombia</a>
+        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=jcoptimizacion1@gmail.com" target="_blank">jcoptimizacion1@gmail.com</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 JC Optimización Digitales.</span>
+      <div class="footer-socials">
+        <a href="https://wa.me/573043854745" target="_blank"><i class="fab fa-whatsapp"></i></a>
+        <a href="https://www.instagram.com/jc_optimizacion_digital" target="_blank"><i class="fab fa-instagram"></i></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<div class="wa-float">
+  <span class="wa-tooltip">¿Tienes dudas? ¡Escríbeme!</span>
+  <a href="https://wa.me/573043854745?text=Hola%20JC%2C%20quiero%20más%20información" target="_blank" class="wa-btn">
+    <div class="wa-pulse"></div>
+    <i class="fab fa-whatsapp" style="position:relative;z-index:1"></i>
+  </a>
+</div>
+
+<script>
+function toggleMobileMenu() { document.getElementById('mobileMenu').classList.toggle('open') }
+
+function toggleFAQ(btn) {
+  const isOpen = btn.classList.contains('open')
+  // Close all
+  document.querySelectorAll('.faq-question.open').forEach(q => {
+    q.classList.remove('open')
+    q.nextElementSibling.classList.remove('open')
+  })
+  if (!isOpen) {
+    btn.classList.add('open')
+    btn.nextElementSibling.classList.add('open')
+  }
+}
+
+function filterCategory(cat, btn) {
+  document.querySelectorAll('.faq-category-btn').forEach(b => b.classList.remove('active'))
+  btn.classList.add('active')
+  document.querySelectorAll('.faq-group').forEach(g => {
+    g.style.display = (cat === 'all' || g.dataset.category === cat) ? 'block' : 'none'
+  })
+}
+
+function searchFAQ(query) {
+  const q = query.toLowerCase()
+  document.querySelectorAll('.faq-item').forEach(item => {
+    const text = item.textContent.toLowerCase()
+    item.style.display = text.includes(q) ? 'block' : 'none'
+  })
+  document.querySelectorAll('.faq-group').forEach(g => {
+    const visible = [...g.querySelectorAll('.faq-item')].some(i => i.style.display !== 'none')
+    g.style.display = visible ? 'block' : 'none'
+  })
+}
+
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target) } })
+}, { threshold: 0.08 })
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el))
+</script>
+</body>
+</html>

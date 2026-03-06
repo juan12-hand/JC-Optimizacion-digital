@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog — JC Optimización Digitales</title>
+<link rel="stylesheet" href="shared.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+.blog-section { max-width: 1200px; margin: 0 auto; padding: 60px 40px 120px; }
+.blog-featured {
+  display: grid; grid-template-columns: 1.4fr 1fr; gap: 2px;
+  background: var(--border); border: 1px solid var(--border); margin-bottom: 2px;
+}
+.post-featured {
+  background: var(--charcoal); padding: 64px 56px;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  min-height: 480px; position: relative; overflow: hidden;
+}
+.post-featured::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 80% 20%, rgba(13,148,136,0.2), transparent 60%);
+}
+.post-tag-dark { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--teal-light); margin-bottom: 20px; position: relative; }
+.post-featured h2 { font-size: 36px; color: white; position: relative; line-height: 1.15; margin-bottom: 16px; }
+.post-featured p { color: rgba(255,255,255,0.6); font-size: 14px; line-height: 1.7; position: relative; margin-bottom: 32px; }
+.post-meta { display: flex; align-items: center; gap: 16px; font-size: 12px; color: rgba(255,255,255,0.4); position: relative; }
+.post-meta span { display: flex; align-items: center; gap: 6px; }
+.read-link { color: var(--teal-light); text-decoration: none; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px; letter-spacing: 0.05em; position: relative; transition: gap 0.2s; }
+.read-link:hover { gap: 10px; }
+
+.blog-sidebar { display: flex; flex-direction: column; gap: 2px; background: var(--border); }
+.post-side {
+  background: var(--card); padding: 36px 32px; flex: 1;
+  transition: background 0.2s; cursor: pointer; position: relative;
+}
+.post-side::after { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--teal); transform: scaleY(0); transition: transform 0.3s; }
+.post-side:hover { background: var(--cream); }
+.post-side:hover::after { transform: scaleY(1); }
+.post-tag { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--teal); margin-bottom: 12px; }
+.post-side h3 { font-size: 20px; margin-bottom: 10px; line-height: 1.2; }
+.post-side p { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
+.post-meta-light { font-size: 11px; color: var(--muted); display: flex; gap: 12px; }
+
+.blog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; background: var(--border); border: 1px solid var(--border); margin-top: 2px; }
+.post-card { background: var(--card); padding: 40px 32px; transition: background 0.2s; position: relative; overflow: hidden; }
+.post-card::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--teal); transform: scaleX(0); transition: transform 0.3s; }
+.post-card:hover { background: var(--cream); }
+.post-card:hover::before { transform: scaleX(1); }
+.post-card h3 { font-size: 22px; margin: 12px 0 12px; line-height: 1.2; }
+.post-card p { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
+.post-number { font-family: 'Cormorant Garamond', serif; font-size: 64px; color: var(--border); line-height: 1; margin-bottom: -16px; }
+
+.section-divider { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+.section-divider hr { border: none; border-top: 1px solid var(--border); margin: 0 0 48px; }
+.section-divider h2 { font-size: 36px; margin-bottom: 48px; }
+
+.newsletter-bar { background: var(--charcoal); margin: 0 40px 120px; border-radius: 12px; padding: 64px 80px; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+.newsletter-bar h2 { font-size: 40px; color: white; }
+.newsletter-bar p { color: rgba(255,255,255,0.6); margin-top: 12px; font-size: 15px; }
+.newsletter-form { display: flex; gap: 12px; }
+.newsletter-form input { flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 4px; padding: 14px 20px; color: white; font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; }
+.newsletter-form input::placeholder { color: rgba(255,255,255,0.3); }
+.newsletter-form input:focus { border-color: var(--teal); }
+.btn-subscribe { background: var(--teal); color: white; border: none; padding: 14px 28px; border-radius: 4px; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 500; white-space: nowrap; transition: background 0.2s; }
+.btn-subscribe:hover { background: #0d9488; }
+
+@media (max-width: 900px) {
+  .blog-featured { grid-template-columns: 1fr; }
+  .blog-grid { grid-template-columns: 1fr 1fr; }
+  .newsletter-bar { grid-template-columns: 1fr; gap: 32px; padding: 48px 32px; margin: 0 20px 80px; }
+}
+@media (max-width: 600px) {
+  .blog-grid { grid-template-columns: 1fr; }
+  .blog-section { padding: 40px 20px 80px; }
+  .newsletter-form { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-mark">J</div>
+      <span class="logo-text">JC <span>Optimización</span></span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Inicio</a>
+      <a href="servicios.html">Servicios</a>
+      <a href="blog.html" class="active">Blog</a>
+      <a href="faq.html">FAQ</a>
+      <a href="servicios.html" class="nav-cta">Contratar</a>
+    </div>
+    <button class="nav-mobile-toggle" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="mobileMenu">
+  <a href="index.html" onclick="toggleMobileMenu()">Inicio</a>
+  <a href="servicios.html" onclick="toggleMobileMenu()">Servicios</a>
+  <a href="blog.html" onclick="toggleMobileMenu()">Blog</a>
+  <a href="faq.html" onclick="toggleMobileMenu()">FAQ</a>
+  <a href="servicios.html" onclick="toggleMobileMenu()">Contratar →</a>
+</div>
+
+<div class="page-header">
+  <div class="page-tag">Blog & Tips</div>
+  <h1>Consejos para tu vida profesional.</h1>
+  <p>Artículos, guías y tips para destacar en el mercado laboral colombiano.</p>
+</div>
+
+<section class="blog-section">
+  <!-- Featured -->
+  <div class="blog-featured reveal">
+    <div class="post-featured">
+      <div class="post-tag-dark">✦ Destacado · Hoja de Vida</div>
+      <h2>Los 7 errores que arruinan tu hoja de vida (y cómo corregirlos)</h2>
+      <p>Muchos candidatos pierden oportunidades de empleo no por falta de experiencia, sino por errores evitables en su hoja de vida. Aquí los más comunes.</p>
+      <div class="post-meta" style="margin-bottom:24px">
+        <span><i class="fas fa-calendar"></i> Enero 2026</span>
+        <span><i class="fas fa-clock"></i> 5 min lectura</span>
+      </div>
+      <a href="#" class="read-link">Leer artículo <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div class="blog-sidebar">
+      <div class="post-side">
+        <div class="post-tag">Presentaciones</div>
+        <h3>Cómo estructurar una presentación que convence</h3>
+        <p>La regla de los 3 actos aplicada al mundo corporativo. Simple pero poderosa.</p>
+        <div class="post-meta-light"><span><i class="fas fa-calendar"></i> Feb 2026</span><span>4 min</span></div>
+      </div>
+      <div class="post-side">
+        <div class="post-tag">Excel</div>
+        <h3>5 fórmulas de Excel que todo profesional debe saber</h3>
+        <p>BUSCARV, SUMAR.SI, CONTAR.SI y más. Aprende a usarlas en minutos.</p>
+        <div class="post-meta-light"><span><i class="fas fa-calendar"></i> Feb 2026</span><span>6 min</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grid de posts -->
+  <div class="blog-grid reveal delay-1">
+    <div class="post-card">
+      <div class="post-number">01</div>
+      <div class="post-tag">Carrera profesional</div>
+      <h3>Qué es el ATS y por qué tu hoja de vida debe adaptarse</h3>
+      <p>Los sistemas de seguimiento de candidatos filtran el 75% de los CVs antes de llegar a un humano. Aprende a optimizar el tuyo.</p>
+      <div class="post-meta-light"><span><i class="fas fa-clock"></i> 4 min lectura</span></div>
+    </div>
+    <div class="post-card">
+      <div class="post-number">02</div>
+      <div class="post-tag">Documentos</div>
+      <h3>La diferencia entre un documento bueno y uno profesional</h3>
+      <p>El formato, la tipografía y el espaciado comunican tanto como el contenido. Te explicamos cómo lograrlo.</p>
+      <div class="post-meta-light"><span><i class="fas fa-clock"></i> 3 min lectura</span></div>
+    </div>
+    <div class="post-card">
+      <div class="post-number">03</div>
+      <div class="post-tag">Tips</div>
+      <h3>Cómo escribir un correo profesional que siempre recibe respuesta</h3>
+      <p>Estructura, tono y longitud. Los tres elementos que determinan si tu correo es leído o ignorado.</p>
+      <div class="post-meta-light"><span><i class="fas fa-clock"></i> 5 min lectura</span></div>
+    </div>
+    <div class="post-card">
+      <div class="post-number">04</div>
+      <div class="post-tag">Tecnología</div>
+      <h3>Herramientas digitales gratuitas para profesionales en 2026</h3>
+      <p>Desde diseño hasta productividad. Las mejores herramientas online que deberías estar usando hoy.</p>
+      <div class="post-meta-light"><span><i class="fas fa-clock"></i> 7 min lectura</span></div>
+    </div>
+    <div class="post-card">
+      <div class="post-number">05</div>
+      <div class="post-tag">Carrera</div>
+      <h3>Por qué el diseño de tu CV importa más de lo que crees</h3>
+      <p>Un reclutador promedio dedica 7 segundos a cada hoja de vida. El primer impacto visual lo es todo.</p>
+      <div class="post-meta-light"><span><i class="fas fa-clock"></i> 3 min lectura</span></div>
+    </div>
+    <div class="post-card">
+      <div class="post-number">06</div>
+      <div class="post-tag">Freelance</div>
+      <h3>Cómo crear una propuesta de servicios que el cliente no puede rechazar</h3>
+      <p>La estructura perfecta de una propuesta freelance. Desde el problema hasta el precio, paso a paso.</p>
+      <div class="post-meta-light"><span><i class="fas fa-clock"></i> 6 min lectura</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- Newsletter -->
+<div class="newsletter-bar reveal">
+  <div>
+    <h2>Tips profesionales, directo a tu correo.</h2>
+    <p>Cada semana, un artículo práctico para mejorar tu perfil profesional. Sin spam.</p>
+  </div>
+  <div>
+    <div class="newsletter-form">
+      <input type="email" placeholder="tu@correo.com" id="newsletterEmail">
+      <button class="btn-subscribe" onclick="subscribeNewsletter()">Suscribirse</button>
+    </div>
+    <p style="color:rgba(255,255,255,0.3);font-size:11px;margin-top:12px;letter-spacing:0.03em">Sin spam. Cancela cuando quieras.</p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo" style="margin-bottom:16px">
+          <div class="logo-mark">J</div>
+          <span class="logo-text" style="color:white">JC <span>Optimización</span></span>
+        </div>
+        <p>Especialistas en documentos profesionales. Santa Marta, Colombia.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Páginas</h5>
+        <a href="index.html">Inicio</a>
+        <a href="servicios.html">Servicios</a>
+        <a href="blog.html">Blog</a>
+        <a href="faq.html">FAQ</a>
+      </div>
+      <div class="footer-col">
+        <h5>Contacto</h5>
+        <a href="https://wa.me/573043854745" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+        <a href="https://www.instagram.com/jc_optimizacion_digital" target="_blank"><i class="fab fa-instagram"></i> Instagram</a>
+      </div>
+      <div class="footer-col">
+        <h5>Santa Marta</h5>
+        <a href="#">Colombia</a>
+        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=jcoptimizacion1@gmail.com" target="_blank">jcoptimizacion1@gmail.com</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 JC Optimización Digitales.</span>
+      <div class="footer-socials">
+        <a href="https://wa.me/573043854745" target="_blank"><i class="fab fa-whatsapp"></i></a>
+        <a href="https://www.instagram.com/jc_optimizacion_digital" target="_blank"><i class="fab fa-instagram"></i></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<div class="wa-float">
+  <span class="wa-tooltip">¿Tienes dudas? ¡Escríbeme!</span>
+  <a href="https://wa.me/573043854745?text=Hola%20JC%2C%20quiero%20más%20información" target="_blank" class="wa-btn">
+    <div class="wa-pulse"></div>
+    <i class="fab fa-whatsapp" style="position:relative;z-index:1"></i>
+  </a>
+</div>
+
+<script>
+function toggleMobileMenu() { document.getElementById('mobileMenu').classList.toggle('open') }
+function subscribeNewsletter() {
+  const email = document.getElementById('newsletterEmail').value.trim()
+  if (!email) return
+  const t = document.createElement('div')
+  t.className = 'toast'
+  t.innerHTML = '✓ ¡Suscrito! Pronto recibirás el primer tip.'
+  document.body.appendChild(t)
+  setTimeout(() => { t.style.transition = 'all .4s'; t.style.opacity = '0'; setTimeout(() => t.remove(), 400) }, 3000)
+  document.getElementById('newsletterEmail').value = ''
+}
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target) } })
+}, { threshold: 0.08 })
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el))
+</script>
+</body>
+</html>

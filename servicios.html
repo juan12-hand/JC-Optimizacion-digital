@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Servicios — JC Optimización Digitales</title>
+<link rel="stylesheet" href="shared.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+.services-section { max-width: 1200px; margin: 0 auto; padding: 60px 40px 120px; }
+.services-full-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; background: var(--border); border: 1px solid var(--border); margin-top: 64px; }
+.svc-card {
+  background: var(--card); padding: 48px 36px;
+  display: flex; flex-direction: column; position: relative; overflow: hidden;
+  transition: all 0.3s;
+}
+.svc-card::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+  height: 3px; background: linear-gradient(90deg, var(--teal), #38bdf8);
+  transform: scaleX(0); transform-origin: left; transition: transform 0.4s ease;
+}
+.svc-card:hover { background: #f8fffe; }
+.svc-card:hover::after { transform: scaleX(1); }
+.svc-icon { width: 52px; height: 52px; background: rgba(13,148,136,0.08); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 28px; }
+.svc-icon i { font-size: 22px; color: var(--teal); }
+.svc-card h3 { font-size: 22px; margin-bottom: 12px; }
+.svc-card p { font-size: 14px; color: var(--muted); line-height: 1.7; flex: 1; margin-bottom: 32px; }
+.svc-footer { display: flex; justify-content: space-between; align-items: center; }
+.svc-price { font-family: 'Cormorant Garamond', serif; font-size: 32px; color: var(--charcoal); }
+.svc-price small { font-size: 13px; color: var(--muted); font-family: 'DM Sans', sans-serif; }
+.btn-add {
+  background: var(--charcoal); color: white; border: none;
+  padding: 12px 24px; border-radius: 4px; font-size: 12px;
+  letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer;
+  transition: all 0.2s; font-family: 'DM Sans', sans-serif; font-weight: 500;
+}
+.btn-add:hover { background: var(--teal); transform: translateY(-2px); }
+.btn-add.added { background: var(--teal); }
+
+/* CART SIDEBAR */
+.cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+.cart-overlay.open { opacity: 1; pointer-events: all; }
+.cart-sidebar {
+  position: fixed; top: 0; right: 0; bottom: 0; width: 420px; max-width: 100vw;
+  background: white; z-index: 201; display: flex; flex-direction: column;
+  transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: -20px 0 60px rgba(0,0,0,0.15);
+}
+.cart-sidebar.open { transform: translateX(0); }
+.cart-head { padding: 32px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.cart-head h3 { font-size: 24px; }
+.cart-close { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--muted); transition: color 0.2s; }
+.cart-close:hover { color: var(--charcoal); }
+.cart-body { flex: 1; overflow-y: auto; padding: 24px 32px; }
+.cart-empty { text-align: center; padding: 60px 20px; color: var(--muted); }
+.cart-empty i { font-size: 48px; opacity: 0.2; margin-bottom: 16px; display: block; }
+.cart-item { display: flex; gap: 16px; padding: 20px 0; border-bottom: 1px solid var(--border); }
+.cart-item-info { flex: 1; }
+.cart-item-info h4 { font-size: 14px; font-family: 'DM Sans', sans-serif; font-weight: 500; margin-bottom: 4px; }
+.cart-item-info span { font-size: 12px; color: var(--muted); }
+.cart-item-right { text-align: right; }
+.cart-item-price { font-family: 'Cormorant Garamond', serif; font-size: 22px; }
+.cart-qty { display: flex; align-items: center; gap: 10px; margin-top: 8px; justify-content: flex-end; }
+.qty-btn { width: 24px; height: 24px; border: 1px solid var(--border); background: none; border-radius: 4px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.qty-btn:hover { background: var(--charcoal); color: white; border-color: var(--charcoal); }
+.qty-val { font-size: 14px; width: 20px; text-align: center; }
+.remove-btn { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 12px; margin-top: 4px; opacity: 0.7; transition: opacity 0.2s; }
+.remove-btn:hover { opacity: 1; }
+.cart-foot { padding: 24px 32px; border-top: 1px solid var(--border); }
+.cart-total-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 24px; }
+.cart-total-row span { font-size: 14px; color: var(--muted); }
+.cart-total-row strong { font-family: 'Cormorant Garamond', serif; font-size: 36px; }
+.btn-checkout { width: 100%; background: var(--charcoal); color: white; border: none; padding: 18px; border-radius: 4px; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 500; transition: background 0.2s; }
+.btn-checkout:hover { background: var(--teal); }
+
+/* CART TRIGGER */
+.cart-trigger {
+  position: fixed; bottom: 100px; right: 28px; z-index: 150;
+  background: var(--charcoal); color: white;
+  width: 56px; height: 56px; border-radius: 50%; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; font-size: 20px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25); transition: all 0.2s;
+}
+.cart-trigger:hover { background: var(--teal); transform: scale(1.1); }
+.cart-badge {
+  position: absolute; top: -4px; right: -4px;
+  background: var(--teal); color: white; width: 20px; height: 20px;
+  border-radius: 50%; font-size: 10px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* CHECKOUT MODAL */
+.modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 300; display: flex; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 20px; display: none; }
+.modal-bg.open { display: flex; }
+.modal-box { background: white; width: 100%; max-width: 560px; border-radius: 12px; overflow: hidden; margin: auto; animation: slideUp 0.3s ease; }
+@keyframes slideUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+.modal-head { padding: 32px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.modal-head h3 { font-size: 26px; }
+.modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--muted); }
+.modal-body { padding: 32px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.form-row.full { grid-template-columns: 1fr; }
+.form-group label { display: block; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.form-group input { width: 100%; border: 1px solid var(--border); border-radius: 6px; padding: 14px 16px; font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.2s; background: var(--cream); }
+.form-group input:focus { border-color: var(--teal); background: white; }
+.phone-wrap { display: flex; }
+.phone-prefix { background: var(--cream); border: 1px solid var(--border); border-right: none; padding: 14px 16px; border-radius: 6px 0 0 6px; font-size: 14px; color: var(--muted); }
+.phone-wrap input { border-radius: 0 6px 6px 0; }
+.modal-summary { background: var(--cream); border-radius: 8px; padding: 20px; margin: 24px 0; }
+.modal-summary h4 { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+.summary-item { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px; }
+.summary-total { display: flex; justify-content: space-between; font-size: 16px; font-weight: 600; border-top: 1px solid var(--border); padding-top: 12px; margin-top: 12px; }
+.nequi-box { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 20px; margin-bottom: 24px; }
+.nequi-box .nequi-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.nequi-box i { font-size: 28px; color: #16a34a; }
+.nequi-box strong { display: block; }
+.nequi-box small { color: var(--muted); font-size: 12px; }
+.copy-btn { background: none; border: none; color: var(--teal); font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; margin-top: 6px; font-family: 'DM Sans', sans-serif; }
+.copy-btn:hover { color: var(--charcoal); }
+.btn-confirm { width: 100%; background: #16a34a; color: white; border: none; padding: 18px; border-radius: 6px; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 10px; transition: background 0.2s; }
+.btn-confirm:hover { background: #15803d; }
+
+/* SUCCESS */
+.success-box { text-align: center; padding: 60px 40px; }
+.success-icon { width: 80px; height: 80px; background: #f0fdf4; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 28px; }
+.success-icon i { font-size: 36px; color: #16a34a; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--charcoal); color: white; padding: 14px 24px; border-radius: 6px; font-size: 13px; z-index: 999; display: flex; align-items: center; gap: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+
+@media (max-width: 900px) { .services-full-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 600px) { .services-full-grid { grid-template-columns: 1fr; } .services-section { padding: 40px 20px 80px; } .form-row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-mark">J</div>
+      <span class="logo-text">JC <span>Optimización</span></span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Inicio</a>
+      <a href="servicios.html" class="active">Servicios</a>
+      <a href="blog.html">Blog</a>
+      <a href="faq.html">FAQ</a>
+      <a href="servicios.html" class="nav-cta">Contratar</a>
+    </div>
+    <button class="nav-mobile-toggle" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="mobileMenu">
+  <a href="index.html" onclick="toggleMobileMenu()">Inicio</a>
+  <a href="servicios.html" onclick="toggleMobileMenu()">Servicios</a>
+  <a href="blog.html" onclick="toggleMobileMenu()">Blog</a>
+  <a href="faq.html" onclick="toggleMobileMenu()">FAQ</a>
+  <a href="servicios.html" onclick="toggleMobileMenu()">Contratar →</a>
+</div>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="page-tag">Nuestros servicios</div>
+  <h1>Todo lo que necesitas, en un solo lugar.</h1>
+  <p>Documentos profesionales diseñados para abrirte puertas. Entrega en menos de 48 horas.</p>
+</div>
+
+<!-- SERVICIOS -->
+<section class="services-section">
+  <div class="services-full-grid" id="servicesGrid"></div>
+</section>
+
+<!-- CART TRIGGER -->
+<button class="cart-trigger" onclick="openCart()">
+  <i class="fas fa-shopping-bag"></i>
+  <span class="cart-badge" id="cartBadge">0</span>
+</button>
+
+<!-- CART SIDEBAR -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-sidebar" id="cartSidebar">
+  <div class="cart-head">
+    <h3>Tu pedido</h3>
+    <button class="cart-close" onclick="closeCart()"><i class="fas fa-times"></i></button>
+  </div>
+  <div class="cart-body" id="cartBody"></div>
+  <div class="cart-foot" id="cartFoot" style="display:none">
+    <div class="cart-total-row">
+      <span>Total</span>
+      <strong id="cartTotal">$0</strong>
+    </div>
+    <button class="btn-checkout" onclick="openCheckout()">PROCEDER AL PAGO →</button>
+  </div>
+</div>
+
+<!-- CHECKOUT MODAL -->
+<div class="modal-bg" id="checkoutModal">
+  <div class="modal-box" id="modalBox">
+    <div class="modal-head">
+      <h3>Finalizar pedido</h3>
+      <button class="modal-close" onclick="closeCheckout()">×</button>
+    </div>
+    <div class="modal-body" id="modalBody">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nombre completo</label>
+          <input id="fName" type="text" placeholder="Juan Pérez">
+        </div>
+        <div class="form-group">
+          <label>Correo electrónico</label>
+          <input id="fEmail" type="email" placeholder="tu@email.com">
+        </div>
+      </div>
+      <div class="form-row full">
+        <div class="form-group">
+          <label>WhatsApp</label>
+          <div class="phone-wrap">
+            <span class="phone-prefix">+57</span>
+            <input id="fPhone" type="tel" placeholder="304 385 4745">
+          </div>
+        </div>
+      </div>
+      <div class="modal-summary">
+        <h4>Resumen del pedido</h4>
+        <div id="summaryItems"></div>
+        <div class="summary-total">
+          <span>Total</span>
+          <span id="summaryTotal">$0</span>
+        </div>
+      </div>
+      <div class="nequi-box">
+        <div class="nequi-head">
+          <i class="fas fa-mobile-alt"></i>
+          <div>
+            <strong>Pagar por Nequi</strong>
+            <small>Número: 3043854745</small>
+          </div>
+        </div>
+        <button class="copy-btn" onclick="copyNequi()"><i class="fas fa-copy"></i> Copiar número</button>
+      </div>
+      <button class="btn-confirm" onclick="confirmPayment()">
+        <i class="fab fa-whatsapp"></i> YA PAGUÉ — CONFIRMAR POR WHATSAPP
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- WhatsApp flotante -->
+<div class="wa-float">
+  <span class="wa-tooltip">¿Tienes dudas? ¡Escríbeme!</span>
+  <a href="https://wa.me/573043854745?text=Hola%20JC%2C%20quiero%20más%20información" target="_blank" class="wa-btn">
+    <div class="wa-pulse"></div>
+    <i class="fab fa-whatsapp" style="position:relative;z-index:1"></i>
+  </a>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo" style="margin-bottom:16px">
+          <div class="logo-mark">J</div>
+          <span class="logo-text" style="color:white">JC <span>Optimización</span></span>
+        </div>
+        <p>Especialistas en documentos profesionales. Santa Marta, Colombia.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Páginas</h5>
+        <a href="index.html">Inicio</a>
+        <a href="servicios.html">Servicios</a>
+        <a href="blog.html">Blog</a>
+        <a href="faq.html">FAQ</a>
+      </div>
+      <div class="footer-col">
+        <h5>Contacto</h5>
+        <a href="https://wa.me/573043854745" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+        <a href="https://www.instagram.com/jc_optimizacion_digital" target="_blank"><i class="fab fa-instagram"></i> Instagram</a>
+      </div>
+      <div class="footer-col">
+        <h5>Legal</h5>
+        <a href="#">Términos de servicio</a>
+        <a href="#">Política de privacidad</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 JC Optimización Digitales.</span>
+      <div class="footer-socials">
+        <a href="https://wa.me/573043854745" target="_blank"><i class="fab fa-whatsapp"></i></a>
+        <a href="https://www.instagram.com/jc_optimizacion_digital" target="_blank"><i class="fab fa-instagram"></i></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+const services = [
+  { id:1, name:"Optimización de Hoja de Vida",        price:20000, icon:"fas fa-user-tie",    desc:"Diseño moderno y optimización ATS para que los reclutadores te encuentren primero." },
+  { id:2, name:"Presentaciones Profesionales",         price:15000, icon:"fas fa-chart-line",  desc:"PowerPoint o Google Slides impactantes con diseño corporativo de alto nivel." },
+  { id:3, name:"Documentos en Word",                   price:15000, icon:"fas fa-file-word",   desc:"Cartas, informes, contratos o manuales con formato impecable y profesional." },
+  { id:4, name:"Plantillas y Automatización Excel",    price:25000, icon:"fas fa-file-excel",  desc:"Tablas dinámicas, dashboards y macros para ahorrar tiempo y tomar mejores decisiones." },
+  { id:5, name:"Traducción de Documentos (EN ↔ ES)",  price:15000, icon:"fas fa-language",    desc:"Traducción precisa y natural entre inglés y español para cualquier tipo de documento." },
+  { id:6, name:"Creación de Páginas Web Básicas",      price:50000, icon:"fas fa-globe",       desc:"Sitios web simples, modernos y profesionales para negocios, servicios o portafolios." },
+  { id:7, name:"Digitalización de Documentos",         price:12000, icon:"fas fa-file-lines",  desc:"Convertimos documentos físicos en archivos digitales editables y trabajos escritos." },
+  { id:8, name:"Corrección y Mejora de Textos",        price:8000,  icon:"fas fa-spell-check", desc:"Corrección ortográfica, de estilo y mejora general de redacción en cualquier texto." }
+]
+
+let cart = []
+
+// Render services
+const grid = document.getElementById('servicesGrid')
+services.forEach((s, i) => {
+  const div = document.createElement('div')
+  div.className = 'svc-card reveal'
+  div.style.transitionDelay = `${i * 0.05}s`
+  div.innerHTML = `
+    <div class="svc-icon"><i class="${s.icon}"></i></div>
+    <h3>${s.name}</h3>
+    <p>${s.desc}</p>
+    <div class="svc-footer">
+      <div class="svc-price">$${s.price.toLocaleString('es-CO')} <small>COP</small></div>
+      <button class="btn-add" id="btn-${s.id}" onclick="addToCart(${s.id})">Agregar</button>
+    </div>
+  `
+  grid.appendChild(div)
+})
+
+// Scroll reveal
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target) } })
+}, { threshold: 0.08 })
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el))
+
+function addToCart(id) {
+  const s = services.find(x => x.id === id)
+  if (!s) return
+  const ex = cart.find(x => x.id === id)
+  if (ex) { ex.qty++ } else { cart.push({ ...s, qty: 1 }) }
+  updateBadge()
+  showToast(`✓ ${s.name} agregado`)
+  const btn = document.getElementById(`btn-${id}`)
+  btn.textContent = 'Agregado ✓'
+  btn.classList.add('added')
+  setTimeout(() => { btn.textContent = 'Agregar'; btn.classList.remove('added') }, 2000)
+}
+
+function removeFromCart(id) {
+  cart = cart.filter(x => x.id !== id)
+  renderCart()
+  updateBadge()
+}
+
+function changeQty(id, d) {
+  const item = cart.find(x => x.id === id)
+  if (!item) return
+  item.qty = Math.max(1, item.qty + d)
+  renderCart()
+}
+
+function updateBadge() {
+  const total = cart.reduce((a, x) => a + x.qty, 0)
+  document.getElementById('cartBadge').textContent = total
+}
+
+function renderCart() {
+  const body = document.getElementById('cartBody')
+  const foot = document.getElementById('cartFoot')
+  if (cart.length === 0) {
+    body.innerHTML = `<div class="cart-empty"><i class="fas fa-shopping-bag"></i><p>Tu carrito está vacío</p></div>`
+    foot.style.display = 'none'
+    return
+  }
+  foot.style.display = 'block'
+  let total = 0
+  body.innerHTML = ''
+  cart.forEach(item => {
+    const sub = item.price * item.qty
+    total += sub
+    const div = document.createElement('div')
+    div.className = 'cart-item'
+    div.innerHTML = `
+      <div class="cart-item-info">
+        <h4>${item.name}</h4>
+        <span>$${item.price.toLocaleString('es-CO')} COP</span>
+        <div><button class="remove-btn" onclick="removeFromCart(${item.id})"><i class="fas fa-times"></i> Eliminar</button></div>
+      </div>
+      <div class="cart-item-right">
+        <div class="cart-item-price">$${sub.toLocaleString('es-CO')}</div>
+        <div class="cart-qty">
+          <button class="qty-btn" onclick="changeQty(${item.id},-1)">−</button>
+          <span class="qty-val">${item.qty}</span>
+          <button class="qty-btn" onclick="changeQty(${item.id},1)">+</button>
+        </div>
+      </div>
+    `
+    body.appendChild(div)
+  })
+  document.getElementById('cartTotal').textContent = `$${total.toLocaleString('es-CO')}`
+}
+
+function openCart() {
+  renderCart()
+  document.getElementById('cartSidebar').classList.add('open')
+  document.getElementById('cartOverlay').classList.add('open')
+  document.body.style.overflow = 'hidden'
+}
+function closeCart() {
+  document.getElementById('cartSidebar').classList.remove('open')
+  document.getElementById('cartOverlay').classList.remove('open')
+  document.body.style.overflow = ''
+}
+
+function openCheckout() {
+  if (!cart.length) return
+  closeCart()
+  // Render summary
+  const items = document.getElementById('summaryItems')
+  items.innerHTML = ''
+  let total = 0
+  cart.forEach(item => {
+    const sub = item.price * item.qty
+    total += sub
+    const div = document.createElement('div')
+    div.className = 'summary-item'
+    div.innerHTML = `<span>${item.name} × ${item.qty}</span><span>$${sub.toLocaleString('es-CO')}</span>`
+    items.appendChild(div)
+  })
+  document.getElementById('summaryTotal').textContent = `$${total.toLocaleString('es-CO')}`
+  document.getElementById('checkoutModal').classList.add('open')
+}
+function closeCheckout() {
+  document.getElementById('checkoutModal').classList.remove('open')
+  document.getElementById('modalBox').innerHTML = document.getElementById('modalBox').innerHTML // reset
+  location.reload() // simple reset
+}
+
+function copyNequi() {
+  navigator.clipboard.writeText('3043854745').then(() => showToast('Número copiado ✓'))
+}
+
+function confirmPayment() {
+  const name  = document.getElementById('fName').value.trim()
+  const email = document.getElementById('fEmail').value.trim()
+  const phone = document.getElementById('fPhone').value.trim()
+  if (!name || !email || !phone) { alert('Por favor completa todos los campos.'); return }
+  let total = 0; cart.forEach(i => total += i.price * i.qty)
+  let msg = `Hola JC, ya pagué por Nequi.%0A%0A*Datos:*%0ANombre: ${name}%0AEmail: ${email}%0AWhatsApp: ${phone}%0A%0A*Pedido:*%0A`
+  cart.forEach(i => { msg += `• ${i.name} x${i.qty} = $${(i.price*i.qty).toLocaleString('es-CO')}%0A` })
+  msg += `%0A*Total: $${total.toLocaleString('es-CO')} COP*%0A%0A¡Gracias!`
+  window.open(`https://wa.me/573043854745?text=${msg}`, '_blank')
+
+  // Show success
+  document.getElementById('modalBody').innerHTML = `
+    <div class="success-box">
+      <div class="success-icon"><i class="fas fa-check"></i></div>
+      <h3 style="font-size:32px;margin-bottom:12px">¡Pedido enviado!</h3>
+      <p style="color:var(--muted);margin-bottom:32px">Gracias ${name.split(' ')[0]}. Te contactaremos en cuanto verifiquemos el pago.</p>
+      <button class="btn-primary" style="margin:0 auto" onclick="window.location.reload()">Volver a servicios</button>
+    </div>
+  `
+  cart = []; updateBadge()
+}
+
+function showToast(text) {
+  const t = document.createElement('div')
+  t.className = 'toast'
+  t.innerHTML = text
+  document.body.appendChild(t)
+  setTimeout(() => { t.style.transition = 'all .4s'; t.style.opacity = '0'; setTimeout(() => t.remove(), 400) }, 2500)
+}
+
+function toggleMobileMenu() {
+  document.getElementById('mobileMenu').classList.toggle('open')
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeCart(); closeCheckout() }
+})
+</script>
+</body>
+</html>

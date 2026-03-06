@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog — JC Optimización Digitales</title>
+<link rel="stylesheet" href="shared.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+.blog-section { max-width: 1200px; margin: 0 auto; padding: 60px 40px 120px; }
+.blog-featured { display: grid; grid-template-columns: 1.4fr 1fr; gap: 2px; background: var(--border); border: 1px solid var(--border); margin-bottom: 2px; }
+.post-featured { background: var(--charcoal); padding: 64px 56px; display: flex; flex-direction: column; justify-content: flex-end; min-height: 480px; position: relative; overflow: hidden; cursor: pointer; transition: opacity 0.2s; }
+.post-featured:hover { opacity: 0.9; }
+.post-featured::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 80% 20%, rgba(13,148,136,0.2), transparent 60%); }
+.post-tag-dark { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--teal-light); margin-bottom: 20px; position: relative; z-index: 1; }
+.post-featured h2 { font-size: 36px; color: white; position: relative; z-index: 1; line-height: 1.15; margin-bottom: 16px; }
+.post-featured .excerpt { color: rgba(255,255,255,0.6); font-size: 14px; line-height: 1.7; position: relative; z-index: 1; margin-bottom: 32px; }
+.post-meta { display: flex; align-items: center; gap: 16px; font-size: 12px; color: rgba(255,255,255,0.4); position: relative; z-index: 1; margin-bottom: 20px; }
+.post-meta span { display: flex; align-items: center; gap: 6px; }
+.read-link { color: var(--teal-light); font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; letter-spacing: 0.05em; position: relative; z-index: 1; transition: gap 0.2s; background: none; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; padding: 0; }
+.read-link:hover { gap: 10px; }
+
+.blog-sidebar { display: flex; flex-direction: column; gap: 2px; background: var(--border); }
+.post-side { background: var(--card); padding: 36px 32px; flex: 1; transition: background 0.2s; cursor: pointer; position: relative; }
+.post-side::after { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--teal); transform: scaleY(0); transition: transform 0.3s; }
+.post-side:hover { background: var(--cream); }
+.post-side:hover::after { transform: scaleY(1); }
+.post-tag { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--teal); margin-bottom: 12px; }
+.post-side h3 { font-size: 20px; margin-bottom: 10px; line-height: 1.2; }
+.post-side p { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
+.post-meta-light { font-size: 11px; color: var(--muted); display: flex; gap: 12px; align-items: center; }
+.leer-mas { color: var(--teal); font-size: 11px; font-weight: 500; margin-left: auto; }
+
+.blog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; background: var(--border); border: 1px solid var(--border); margin-top: 2px; }
+.post-card { background: var(--card); padding: 40px 32px; cursor: pointer; transition: background 0.2s; position: relative; overflow: hidden; }
+.post-card::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--teal); transform: scaleX(0); transition: transform 0.3s; }
+.post-card:hover { background: var(--cream); }
+.post-card:hover::before { transform: scaleX(1); }
+.post-card h3 { font-size: 22px; margin: 12px 0 12px; line-height: 1.2; }
+.post-card p { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
+.post-number { font-family: 'Cormorant Garamond', serif; font-size: 64px; color: var(--border); line-height: 1; margin-bottom: -16px; }
+.post-card-footer { display: flex; justify-content: space-between; align-items: center; }
+.read-arrow { color: var(--teal); font-size: 12px; font-weight: 500; display: flex; align-items: center; gap: 5px; }
+
+/* ── ARTICLE PANEL ── */
+.article-overlay { position: fixed; inset: 0; background: rgba(10,10,10,0.6); backdrop-filter: blur(5px); z-index: 500; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+.article-overlay.open { opacity: 1; pointer-events: all; }
+
+.article-panel { position: fixed; top: 0; right: 0; bottom: 0; width: min(740px, 100vw); background: #faf8f4; z-index: 501; overflow-y: auto; transform: translateX(105%); transition: transform 0.4s cubic-bezier(0.22,1,0.36,1); box-shadow: -32px 0 80px rgba(0,0,0,0.18); }
+.article-panel.open { transform: translateX(0); }
+
+.panel-topbar { position: sticky; top: 0; z-index: 10; background: rgba(250,248,244,0.96); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); padding: 18px 40px; display: flex; justify-content: space-between; align-items: center; }
+.panel-topbar-label { font-size: 12px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+.panel-close { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border); background: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--muted); font-size: 16px; transition: all 0.2s; }
+.panel-close:hover { background: var(--charcoal); color: white; border-color: var(--charcoal); }
+
+.panel-hero { padding: 52px 52px 36px; border-bottom: 1px solid var(--border); }
+.panel-hero .post-tag { margin-bottom: 16px; }
+.panel-hero h1 { font-size: clamp(26px, 3.5vw, 42px); line-height: 1.1; margin-bottom: 18px; color: var(--charcoal); }
+.panel-hero .summary { font-size: 16px; color: var(--muted); line-height: 1.75; margin-bottom: 24px; }
+.panel-meta { display: flex; gap: 18px; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+.panel-meta span { display: flex; align-items: center; gap: 6px; }
+
+.panel-body { padding: 44px 52px 80px; }
+.panel-body h2 { font-family: 'Cormorant Garamond', serif; font-size: 30px; font-weight: 300; color: var(--charcoal); margin: 40px 0 14px; line-height: 1.2; }
+.panel-body h3 { font-family: 'DM Sans', sans-serif; font-size: 17px; font-weight: 600; color: var(--charcoal); margin: 28px 0 10px; }
+.panel-body p { font-size: 15px; color: #3d3d3d; line-height: 1.9; margin-bottom: 18px; }
+.panel-body ul, .panel-body ol { margin: 12px 0 20px 22px; }
+.panel-body li { font-size: 15px; color: #3d3d3d; line-height: 1.8; margin-bottom: 8px; }
+.panel-body strong { color: var(--charcoal); }
+.panel-tip { background: rgba(13,148,136,0.07); border-left: 3px solid var(--teal); padding: 18px 22px; border-radius: 0 8px 8px 0; margin: 24px 0; }
+.panel-tip p { margin: 0; font-size: 14px; color: var(--charcoal); line-height: 1.7; }
+.panel-cta { background: var(--charcoal); border-radius: 12px; padding: 40px 36px; text-align: center; margin-top: 52px; }
+.panel-cta h3 { color: white; font-size: 26px; margin-bottom: 10px; }
+.panel-cta p { color: rgba(255,255,255,0.6); font-size: 14px; margin-bottom: 24px; }
+.panel-cta a { display: inline-flex; align-items: center; gap: 8px; background: var(--teal); color: white; padding: 14px 28px; border-radius: 4px; font-size: 13px; font-weight: 500; text-decoration: none; letter-spacing: 0.05em; transition: background 0.2s; }
+.panel-cta a:hover { background: #0d9488; }
+
+/* Newsletter */
+.newsletter-bar { background: var(--charcoal); margin: 0 40px 120px; border-radius: 12px; padding: 64px 80px; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+.newsletter-bar h2 { font-size: 40px; color: white; }
+.newsletter-bar > div > p { color: rgba(255,255,255,0.6); margin-top: 12px; font-size: 15px; }
+.newsletter-form { display: flex; gap: 12px; }
+.newsletter-form input { flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 4px; padding: 14px 20px; color: white; font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; }
+.newsletter-form input::placeholder { color: rgba(255,255,255,0.3); }
+.newsletter-form input:focus { border-color: var(--teal); }
+.btn-subscribe { background: var(--teal); color: white; border: none; padding: 14px 28px; border-radius: 4px; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 500; white-space: nowrap; transition: background 0.2s; }
+.btn-subscribe:hover { background: #0d9488; }
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--charcoal); color: white; padding: 14px 24px; border-radius: 6px; font-size: 13px; z-index: 999; display: flex; align-items: center; gap: 10px; }
+
+@media (max-width: 900px) {
+  .blog-featured { grid-template-columns: 1fr; }
+  .blog-grid { grid-template-columns: 1fr 1fr; }
+  .newsletter-bar { grid-template-columns: 1fr; gap: 32px; padding: 48px 32px; margin: 0 20px 80px; }
+  .panel-hero, .panel-body { padding-left: 28px; padding-right: 28px; }
+  .panel-topbar { padding: 16px 24px; }
+}
+@media (max-width: 600px) {
+  .blog-grid { grid-template-columns: 1fr; }
+  .blog-section { padding: 40px 20px 80px; }
+  .post-featured { padding: 40px 28px; min-height: 360px; }
+  .newsletter-form { flex-direction: column; }
+  .panel-hero, .panel-body { padding-left: 20px; padding-right: 20px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-mark">J</div>
+      <span class="logo-text">JC <span>Optimización</span></span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Inicio</a>
+      <a href="servicios.html">Servicios</a>
+      <a href="blog.html" class="active">Blog</a>
+      <a href="faq.html">FAQ</a>
+      <a href="servicios.html" class="nav-cta">Contratar</a>
+    </div>
+    <button class="nav-mobile-toggle" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="mobileMenu">
+  <a href="index.html" onclick="toggleMobileMenu()">Inicio</a>
+  <a href="servicios.html" onclick="toggleMobileMenu()">Servicios</a>
+  <a href="blog.html" onclick="toggleMobileMenu()">Blog</a>
+  <a href="faq.html" onclick="toggleMobileMenu()">FAQ</a>
+  <a href="servicios.html" onclick="toggleMobileMenu()">Contratar →</a>
+</div>
+
+<div class="page-header">
+  <div class="page-tag">Blog & Tips</div>
+  <h1>Consejos para tu vida profesional.</h1>
+  <p>Artículos, guías y tips para destacar en el mercado laboral colombiano.</p>
+</div>
+
+<section class="blog-section">
+  <div class="blog-featured reveal">
+    <div class="post-featured" onclick="openArticle(0)">
+      <div class="post-tag-dark">✦ Destacado · Hoja de Vida</div>
+      <h2>Los 7 errores que arruinan tu hoja de vida (y cómo corregirlos)</h2>
+      <p class="excerpt">Muchos candidatos pierden oportunidades no por falta de experiencia, sino por errores evitables. Aquí los más comunes.</p>
+      <div class="post-meta">
+        <span><i class="fas fa-calendar"></i> Enero 2026</span>
+        <span><i class="fas fa-clock"></i> 5 min lectura</span>
+      </div>
+      <button class="read-link">Leer artículo <i class="fas fa-arrow-right"></i></button>
+    </div>
+    <div class="blog-sidebar">
+      <div class="post-side" onclick="openArticle(1)">
+        <div class="post-tag">Presentaciones</div>
+        <h3>Cómo estructurar una presentación que convence</h3>
+        <p>La regla de los 3 actos aplicada al mundo corporativo.</p>
+        <div class="post-meta-light"><span><i class="fas fa-clock"></i> 4 min</span><span class="leer-mas">Leer →</span></div>
+      </div>
+      <div class="post-side" onclick="openArticle(2)">
+        <div class="post-tag">Excel</div>
+        <h3>5 fórmulas de Excel que todo profesional debe saber</h3>
+        <p>BUSCARV, SUMAR.SI, CONTAR.SI y más.</p>
+        <div class="post-meta-light"><span><i class="fas fa-clock"></i> 6 min</span><span class="leer-mas">Leer →</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="blog-grid reveal delay-1">
+    <div class="post-card" onclick="openArticle(3)">
+      <div class="post-number">01</div>
+      <div class="post-tag">Carrera</div>
+      <h3>Qué es el ATS y por qué tu hoja de vida debe adaptarse</h3>
+      <p>Los sistemas de seguimiento filtran el 75% de los CVs antes de llegar a un humano.</p>
+      <div class="post-card-footer"><div class="post-meta-light"><i class="fas fa-clock"></i> 4 min</div><span class="read-arrow">Leer <i class="fas fa-arrow-right"></i></span></div>
+    </div>
+    <div class="post-card" onclick="openArticle(4)">
+      <div class="post-number">02</div>
+      <div class="post-tag">Documentos</div>
+      <h3>La diferencia entre un documento bueno y uno profesional</h3>
+      <p>El formato y la tipografía comunican tanto como el contenido.</p>
+      <div class="post-card-footer"><div class="post-meta-light"><i class="fas fa-clock"></i> 3 min</div><span class="read-arrow">Leer <i class="fas fa-arrow-right"></i></span></div>
+    </div>
+    <div class="post-card" onclick="openArticle(5)">
+      <div class="post-number">03</div>
+      <div class="post-tag">Tips</div>
+      <h3>Cómo escribir un correo profesional que siempre recibe respuesta</h3>
+      <p>Estructura, tono y longitud. Los tres elementos clave.</p>
+      <div class="post-card-footer"><div class="post-meta-light"><i class="fas fa-clock"></i> 5 min</div><span class="read-arrow">Leer <i class="fas fa-arrow-right"></i></span></div>
+    </div>
+    <div class="post-card" onclick="openArticle(6)">
+      <div class="post-number">04</div>
+      <div class="post-tag">Tecnología</div>
+      <h3>Herramientas digitales gratuitas para profesionales en 2026</h3>
+      <p>Las mejores herramientas online que deberías estar usando hoy.</p>
+      <div class="post-card-footer"><div class="post-meta-light"><i class="fas fa-clock"></i> 7 min</div><span class="read-arrow">Leer <i class="fas fa-arrow-right"></i></span></div>
+    </div>
+    <div class="post-card" onclick="openArticle(7)">
+      <div class="post-number">05</div>
+      <div class="post-tag">Carrera</div>
+      <h3>Por qué el diseño de tu CV importa más de lo que crees</h3>
+      <p>Un reclutador dedica 7 segundos a cada hoja de vida. El impacto visual lo es todo.</p>
+      <div class="post-card-footer"><div class="post-meta-light"><i class="fas fa-clock"></i> 3 min</div><span class="read-arrow">Leer <i class="fas fa-arrow-right"></i></span></div>
+    </div>
+    <div class="post-card" onclick="openArticle(8)">
+      <div class="post-number">06</div>
+      <div class="post-tag">Freelance</div>
+      <h3>Cómo crear una propuesta que el cliente no puede rechazar</h3>
+      <p>La estructura perfecta desde el problema hasta el precio.</p>
+      <div class="post-card-footer"><div class="post-meta-light"><i class="fas fa-clock"></i> 6 min</div><span class="read-arrow">Leer <i class="fas fa-arrow-right"></i></span></div>
+    </div>
+  </div>
+</section>
+
+<div class="newsletter-bar reveal">
+  <div>
+    <h2>Tips profesionales, directo a tu correo.</h2>
+    <p>Cada semana, un artículo práctico para mejorar tu perfil. Sin spam.</p>
+  </div>
+  <div>
+    <div class="newsletter-form">
+      <input type="email" placeholder="tu@correo.com" id="newsletterEmail">
+      <button class="btn-subscribe" onclick="subscribeNewsletter()">Suscribirse</button>
+    </div>
+    <p style="color:rgba(255,255,255,0.3);font-size:11px;margin-top:12px">Sin spam. Cancela cuando quieras.</p>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo" style="margin-bottom:16px">
+          <div class="logo-mark">J</div>
+          <span class="logo-text" style="color:white">JC <span>Optimización</span></span>
+        </div>
+        <p>Especialistas en documentos profesionales. Santa Marta, Colombia.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Páginas</h5>
+        <a href="index.html">Inicio</a>
+        <a href="servicios.html">Servicios</a>
+        <a href="blog.html">Blog</a>
+        <a href="faq.html">FAQ</a>
+      </div>
+      <div class="footer-col">
+        <h5>Contacto</h5>
+        <a href="https://wa.me/573043854745" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+        <a href="https://www.instagram.com/jc_optimizacion_digital" target="_blank"><i class="fab fa-instagram"></i> Instagram</a>
+      </div>
+      <div class="footer-col">
+        <h5>Santa Marta</h5>
+        <a href="#">Colombia</a>
+        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=jcoptimizacion1@gmail.com" target="_blank">jcoptimizacion1@gmail.com</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 JC Optimización Digitales.</span>
+      <div class="footer-socials">
+        <a href="https://wa.me/573043854745" target="_blank"><i class="fab fa-whatsapp"></i></a>
+        <a href="https://www.instagram.com/jc_optimizacion_digital" target="_blank"><i class="fab fa-instagram"></i></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<div class="wa-float">
+  <span class="wa-tooltip">¿Tienes dudas? ¡Escríbeme!</span>
+  <a href="https://wa.me/573043854745?text=Hola%20JC%2C%20quiero%20más%20información" target="_blank" class="wa-btn">
+    <div class="wa-pulse"></div>
+    <i class="fab fa-whatsapp" style="position:relative;z-index:1"></i>
+  </a>
+</div>
+
+<!-- ARTICLE PANEL -->
+<div class="article-overlay" id="articleOverlay" onclick="closeArticle()"></div>
+<div class="article-panel" id="articlePanel">
+  <div class="panel-topbar">
+    <span class="panel-topbar-label">JC Optimización · Blog</span>
+    <button class="panel-close" onclick="closeArticle()"><i class="fas fa-times"></i></button>
+  </div>
+  <div id="panelContent"></div>
+</div>
+
+<script>
+const articles = [
+  {
+    tag:"Hoja de Vida", date:"Enero 2026", time:"5 min lectura",
+    title:"Los 7 errores que arruinan tu hoja de vida (y cómo corregirlos)",
+    summary:"Muchos candidatos pierden oportunidades no por falta de experiencia, sino por errores evitables. Aquí los más comunes y cómo solucionarlos.",
+    body:`<h2>¿Por qué importa tanto la hoja de vida?</h2><p>En un mercado laboral competitivo, tu hoja de vida es tu primera impresión. Un reclutador dedica en promedio <strong>7 segundos</strong> a cada CV antes de decidir si continúa o lo descarta.</p><h2>Error #1: Foto incorrecta o sin foto</h2><p>En Colombia incluir foto es práctica común. Usa una foto profesional, con buena iluminación, fondo neutro y ropa formal. Evita selfies o fotos informales.</p><h2>Error #2: Información de contacto incompleta</h2><p>Muchas hojas de vida no incluyen ciudad, WhatsApp actualizado o correo profesional. Evita correos como <em>perritos2005@hotmail.com</em>. Crea uno con tu nombre.</p><h2>Error #3: Objetivo profesional genérico</h2><p>Frases como "busco crecer personal y profesionalmente" no aportan nada. Personaliza tu objetivo para el cargo específico al que aplicas.</p><div class="panel-tip"><p><strong>Consejo:</strong> Menciona el cargo y una habilidad clave. Ej: "Contador con 3 años en sector retail, busco aportar al área financiera de empresas en crecimiento."</p></div><h2>Error #4: Experiencia sin logros</h2><p>Listar solo funciones es lo que hace el 90% de candidatos. Los que destacan incluyen logros medibles: "aumenté las ventas un 15% en 3 meses".</p><h2>Error #5: Formato inconsistente</h2><p>Múltiples fuentes, colores chillones y márgenes desiguales restan credibilidad. El formato debe ser limpio, coherente y jerarquizado.</p><h2>Error #6: No optimizar para ATS</h2><p>Los sistemas ATS filtran hojas de vida automáticamente. Si no incluyes palabras clave de la oferta, tu CV puede ser eliminado antes de que alguien lo vea.</p><h2>Error #7: CV demasiado largo</h2><p>Para menos de 10 años de experiencia, 1 a 2 páginas es suficiente. Más páginas no significan más méritos.</p><div class="panel-tip"><p><strong>Resumen:</strong> Clara, personalizada, orientada a logros y visualmente profesional. En JC Optimización lo hacemos por ti desde $20.000 COP.</p></div>`
+  },
+  {
+    tag:"Presentaciones", date:"Febrero 2026", time:"4 min lectura",
+    title:"Cómo estructurar una presentación que convence",
+    summary:"La regla de los 3 actos aplicada al mundo corporativo. Simple pero increíblemente poderosa.",
+    body:`<h2>El problema con la mayoría de presentaciones</h2><p>Están diseñadas para informar, no para convencer. Datos, tablas y texto que nadie lee. El resultado: audiencias aburridas y mensajes que no se recuerdan.</p><h2>Acto 1: El problema (25% del tiempo)</h2><p>Empieza describiendo el estado actual. Luego introduce el conflicto o la oportunidad perdida. Esta tensión engancha a la audiencia.</p><div class="panel-tip"><p><strong>Tip:</strong> Abre con una pregunta o dato sorprendente. Nunca empieces con "buenos días, mi nombre es..."</p></div><h2>Acto 2: La solución (50% del tiempo)</h2><p>Presenta tu propuesta como el puente entre el problema y el estado deseado. Sé específico: cómo funciona, con qué recursos y en qué tiempo.</p><h2>Acto 3: El llamado a la acción (25% del tiempo)</h2><p>¿Qué quieres que haga tu audiencia? ¿Aprobación de presupuesto? ¿Una reunión? El final debe ser claro y memorable.</p><h2>Reglas de diseño</h2><ul><li>Una idea por diapositiva, nunca más.</li><li>Usa imágenes reales, no cliparts genéricos.</li><li>Máximo 6 líneas de texto por slide.</li><li>Paleta de 2 a 3 colores, consistencia total.</li><li>Fuente mínima recomendada: 24px.</li></ul>`
+  },
+  {
+    tag:"Excel", date:"Febrero 2026", time:"6 min lectura",
+    title:"5 fórmulas de Excel que todo profesional debe saber",
+    summary:"BUSCARV, SUMAR.SI, CONTAR.SI y más. Aprende a usarlas en minutos y ahorra horas de trabajo cada semana.",
+    body:`<h2>¿Por qué Excel sigue siendo relevante?</h2><p>A pesar de herramientas más modernas, Excel sigue siendo el rey de la gestión de datos en empresas colombianas. Dominar sus fórmulas clave puede ahorrarte horas cada semana.</p><h2>1. BUSCARV</h2><p>Busca un valor en una columna y devuelve el de otra. Ideal para cruzar bases de datos.</p><div class="panel-tip"><p><code>=BUSCARV(valor_buscado, rango, columna, FALSO)</code><br>Ejemplo: Buscar el precio de un producto por su código.</p></div><h2>2. SUMAR.SI</h2><p>Suma valores que cumplen una condición específica.</p><div class="panel-tip"><p><code>=SUMAR.SI(rango_condición, condición, rango_suma)</code><br>Ejemplo: Sumar solo las ventas del vendedor "Juan".</p></div><h2>3. CONTAR.SI</h2><p>Cuenta cuántas celdas cumplen una condición.</p><div class="panel-tip"><p><code>=CONTAR.SI(rango, condición)</code><br>Ejemplo: Contar clientes de "Bogotá".</p></div><h2>4. SI anidado</h2><p>Evalúa múltiples condiciones y devuelve distintos resultados.</p><div class="panel-tip"><p><code>=SI(cond1, res1, SI(cond2, res2, res3))</code><br>Ejemplo: Categorizar ventas como Alta, Media o Baja.</p></div><h2>5. TEXTO</h2><p>Convierte valores numéricos a texto con formato específico.</p><div class="panel-tip"><p><code>=TEXTO(HOY(),"DD/MM/AAAA")</code> → 15/03/2026</p></div><p>¿Necesitas plantillas o automatizaciones en Excel? En JC Optimización lo hacemos desde $25.000 COP.</p>`
+  },
+  {
+    tag:"Carrera profesional", date:"Marzo 2026", time:"4 min lectura",
+    title:"Qué es el ATS y por qué tu hoja de vida debe adaptarse",
+    summary:"Los sistemas de seguimiento de candidatos filtran el 75% de los CVs antes de llegar a un humano. Aprende a pasar ese filtro.",
+    body:`<h2>¿Qué es un ATS?</h2><p>ATS significa <strong>Applicant Tracking System</strong>. Es un software que usan las empresas para recibir, organizar y filtrar hojas de vida automáticamente antes de que cualquier reclutador las vea.</p><h2>El dato que lo cambia todo</h2><p>El <strong>75% de los candidatos son rechazados por el ATS</strong> antes de que un humano los vea. Podrías ser el candidato ideal y nunca recibir una llamada.</p><h2>Cómo optimizar tu CV para ATS</h2><ul><li><strong>Usa las palabras clave de la oferta:</strong> Lee el aviso e incluye los términos exactos que usan.</li><li><strong>Evita tablas y columnas complejas:</strong> Muchos ATS no las leen correctamente.</li><li><strong>Usa encabezados estándar:</strong> "Experiencia laboral", "Educación", "Habilidades".</li><li><strong>Formato .docx o PDF simple:</strong> Sin imágenes incrustadas ni fuentes muy personalizadas.</li><li><strong>No uses texto dentro de imágenes:</strong> El ATS no puede leerlo.</li></ul><div class="panel-tip"><p><strong>Consejo:</strong> Adapta tu hoja de vida para cada oferta. Un CV personalizado tiene hasta 3 veces más probabilidades de pasar el filtro ATS.</p></div>`
+  },
+  {
+    tag:"Documentos", date:"Marzo 2026", time:"3 min lectura",
+    title:"La diferencia entre un documento bueno y uno profesional",
+    summary:"El formato, la tipografía y el espaciado comunican tanto como el contenido. Te explicamos cómo lograr el estándar profesional.",
+    body:`<h2>El contenido no lo es todo</h2><p>Puedes tener el mejor análisis del mundo, pero en un documento mal formateado, con fuentes mezcladas y márgenes irregulares, pierdes credibilidad antes de ser leído.</p><h2>Tipografía: el primer mensaje silencioso</h2><p>Un documento profesional usa máximo 2 fuentes: una para títulos y otra para el cuerpo. Recomendadas: <strong>Calibri, Georgia, Garamond</strong>. Tamaño: 11 a 12 puntos.</p><div class="panel-tip"><p>Nunca mezcles Comic Sans, Times New Roman y Arial en el mismo documento. Es una señal clara de falta de profesionalismo.</p></div><h2>Espaciado y márgenes</h2><p>Márgenes estándar: 2.5 cm en todos los lados. Interlineado: 1.15 a 1.5. Usa espacio entre párrafos en vez de doble enter.</p><h2>Jerarquía visual</h2><p>El lector debe saber de inmediato qué es título, subtítulo y texto normal. Usa negrilla con moderación: si todo está en negrita, nada destaca.</p><h2>Consistencia total</h2><p>Todos los títulos del mismo nivel: mismo tamaño, color y fuente. Los colores de acento: siempre el mismo tono, con moderación.</p>`
+  },
+  {
+    tag:"Tips", date:"Marzo 2026", time:"5 min lectura",
+    title:"Cómo escribir un correo profesional que siempre recibe respuesta",
+    summary:"Estructura, tono y longitud. Los tres elementos que determinan si tu correo es leído, respondido o ignorado.",
+    body:`<h2>El correo sigue siendo el rey</h2><p>A pesar del auge de WhatsApp y Slack, el correo electrónico sigue siendo el canal principal de comunicación profesional. Pero la mayoría son ignorados o mal redactados.</p><h2>El asunto: tu única oportunidad</h2><p>El asunto determina si el correo se abre o se archiva. Debe ser específico, corto y claro.</p><div class="panel-tip"><p><strong>Malo:</strong> "Consulta"<br><strong>Bueno:</strong> "Solicitud de reunión — propuesta proyecto X, semana del 20 de marzo"</p></div><h2>La estructura perfecta</h2><ol><li><strong>Saludo personalizado:</strong> Usa el nombre. "Estimado Juan," gana sobre "A quien corresponda,".</li><li><strong>Contexto en 1 oración:</strong> ¿Por qué escribes? Ve al punto.</li><li><strong>El cuerpo:</strong> Máximo 3 párrafos cortos.</li><li><strong>La solicitud clara:</strong> ¿Qué necesitas y para cuándo?</li><li><strong>Cierre y firma:</strong> Nombre, cargo y contacto.</li></ol><h2>Tono y longitud</h2><p>Ni demasiado informal ni demasiado rígido. Ideal: 3 a 5 oraciones por párrafo, máximo 3 párrafos. Más de 200 palabras y algo debería ir en un adjunto.</p><div class="panel-tip"><p><strong>Regla de oro:</strong> Antes de enviar, pregúntate: ¿está claro qué necesito y para cuándo? Si no, reescribe.</p></div>`
+  },
+  {
+    tag:"Tecnología", date:"Marzo 2026", time:"7 min lectura",
+    title:"Herramientas digitales gratuitas para profesionales en 2026",
+    summary:"Desde diseño hasta inteligencia artificial. Las mejores herramientas online que deberías estar usando hoy mismo.",
+    body:`<h2>Trabaja más inteligente, no más duro</h2><p>En 2026, las mejores herramientas del mercado son gratuitas o tienen planes básicos más que suficientes para la mayoría de necesidades profesionales.</p><h2>Diseño y presentaciones</h2><ul><li><strong>Canva:</strong> Diseño sin ser diseñador. Presentaciones, infografías y más.</li><li><strong>Google Slides:</strong> Alternativa gratuita a PowerPoint con colaboración en tiempo real.</li><li><strong>Beautiful.ai:</strong> Presentaciones que se diseñan solas con IA.</li></ul><h2>Productividad y organización</h2><ul><li><strong>Notion:</strong> Notas, bases de datos y gestión de proyectos en un solo lugar.</li><li><strong>Trello:</strong> Tableros Kanban para organizar tareas visualmente.</li><li><strong>Google Workspace:</strong> Docs, Sheets, Drive. El ecosistema colaborativo esencial.</li></ul><h2>Escritura y corrección</h2><ul><li><strong>LanguageTool:</strong> Corrección ortográfica y de estilo en español, en tiempo real.</li><li><strong>Hemingway Editor:</strong> Analiza la claridad y legibilidad de tu texto.</li></ul><h2>Inteligencia Artificial</h2><ul><li><strong>Claude:</strong> Redacción, análisis y respuestas detalladas con alta precisión.</li><li><strong>ChatGPT:</strong> Generación de textos, ideas y resúmenes.</li><li><strong>Perplexity:</strong> Búsqueda inteligente con fuentes verificadas.</li></ul><div class="panel-tip"><p><strong>Consejo:</strong> No intentes usar todas a la vez. Escoge una por categoría, aprende a usarla bien y luego expande tu kit digital.</p></div>`
+  },
+  {
+    tag:"Carrera", date:"Marzo 2026", time:"3 min lectura",
+    title:"Por qué el diseño de tu CV importa más de lo que crees",
+    summary:"Un reclutador promedio dedica 7 segundos a cada hoja de vida. El primer impacto visual determina si siguen leyendo.",
+    body:`<h2>7 segundos. Eso es todo.</h2><p>Estudios de seguimiento ocular han confirmado que los reclutadores dedican en promedio <strong>7 segundos</strong> a una hoja de vida antes de decidir si siguen o la descartan. El diseño lo es todo en ese momento.</p><h2>Lo que el ojo ve primero</h2><p>Antes de leer una palabra, el reclutador formó una primera impresión: ¿se ve limpio? ¿hay jerarquía visual? ¿es fácil de escanear? Un CV bien diseñado invita a seguir leyendo.</p><h2>Los elementos que más impactan</h2><ul><li><strong>El espacio en blanco:</strong> Un CV con buena respiración visual se percibe como más profesional.</li><li><strong>La jerarquía tipográfica:</strong> Títulos claros, texto bien dimensionado, sin mezcla de fuentes.</li><li><strong>La consistencia:</strong> Todo el documento sigue las mismas reglas visuales.</li><li><strong>El uso del color:</strong> Un toque estratégico puede hacer tu CV memorable.</li></ul><div class="panel-tip"><p><strong>La regla:</strong> Tu hoja de vida debe verse profesional en 1 segundo. Si tienes que explicar el diseño, el diseño no funciona.</p></div><h2>¿Vale la pena invertir?</h2><p>Absolutamente. Una hoja de vida bien diseñada puede ser la diferencia entre pasar a la siguiente ronda o quedarte en el montón. En JC Optimización la diseñamos por ti desde $20.000 COP.</p>`
+  },
+  {
+    tag:"Freelance", date:"Marzo 2026", time:"6 min lectura",
+    title:"Cómo crear una propuesta de servicios que el cliente no puede rechazar",
+    summary:"La estructura perfecta de una propuesta freelance. Desde el problema hasta el precio, paso a paso.",
+    body:`<h2>El error más común en propuestas freelance</h2><p>La mayoría hablan de ellos mismos: sus habilidades, su experiencia, sus certificados. El cliente no quiere saber qué tan bueno eres; quiere saber cómo vas a resolver su problema.</p><h2>La estructura que funciona</h2><h3>1. El problema (no tu servicio)</h3><p>Empieza describiendo el problema del cliente con tus propias palabras. Esto demuestra que entendiste lo que necesita y genera confianza inmediata.</p><h3>2. Tu solución específica</h3><p>Describe exactamente qué vas a hacer, cómo lo harás y qué entregables recibirá. Sé específico: no "diseño tu sitio web" sino "diseño una landing page de 5 secciones en WordPress, optimizada para móvil, lista en 7 días".</p><h3>3. Por qué tú</h3><p>Una o dos oraciones máximo. Una prueba concreta: un proyecto similar que ya hiciste, un resultado medible.</p><h3>4. El precio y las condiciones</h3><p>Sé directo con el precio. Indica qué incluye y qué no, el plazo de entrega y las condiciones de pago. La claridad genera confianza.</p><h3>5. El siguiente paso</h3><p>Termina con una acción clara: "Podemos agendar una llamada de 15 minutos esta semana." Dale facilidad para decir que sí.</p><div class="panel-tip"><p><strong>Regla de oro:</strong> Una propuesta corta y clara gana sobre una larga y completa. Si puedes decirlo en una página, no uses dos.</p></div>`
+  }
+]
+
+function openArticle(idx) {
+  const a = articles[idx]
+  if (!a) return
+  document.getElementById('panelContent').innerHTML = `
+    <div class="panel-hero">
+      <div class="post-tag">${a.tag}</div>
+      <h1>${a.title}</h1>
+      <p class="summary">${a.summary}</p>
+      <div class="panel-meta">
+        <span><i class="fas fa-calendar"></i> ${a.date}</span>
+        <span><i class="fas fa-clock"></i> ${a.time}</span>
+      </div>
+    </div>
+    <div class="panel-body">
+      ${a.body}
+      <div class="panel-cta">
+        <h3>¿Necesitas ayuda con tu perfil?</h3>
+        <p>Nuestros servicios están diseñados para que destagues desde el primer momento.</p>
+        <a href="servicios.html"><i class="fas fa-arrow-right"></i> Ver servicios</a>
+      </div>
+    </div>
+  `
+  document.getElementById('articlePanel').scrollTop = 0
+  document.getElementById('articleOverlay').classList.add('open')
+  document.getElementById('articlePanel').classList.add('open')
+  document.body.style.overflow = 'hidden'
+}
+
+function closeArticle() {
+  document.getElementById('articleOverlay').classList.remove('open')
+  document.getElementById('articlePanel').classList.remove('open')
+  document.body.style.overflow = ''
+}
+
+function subscribeNewsletter() {
+  const email = document.getElementById('newsletterEmail').value.trim()
+  if (!email) return
+  const t = document.createElement('div')
+  t.className = 'toast'
+  t.innerHTML = '✓ ¡Suscrito! Pronto recibirás el primer tip.'
+  document.body.appendChild(t)
+  setTimeout(() => { t.style.transition = 'all .4s'; t.style.opacity = '0'; setTimeout(() => t.remove(), 400) }, 3000)
+  document.getElementById('newsletterEmail').value = ''
+}
+
+function toggleMobileMenu() { document.getElementById('mobileMenu').classList.toggle('open') }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeArticle() })
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target) } })
+}, { threshold: 0.08 })
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el))
+</script>
+</body>
+</html>
